@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
   
 export default function HomeScreen() {
+
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&apiKey=5912444f7eba46f4af23efe4057e9838`);
+        const response = await fetch(`https://newsapi.org/v2/top-headlines?category=technology&apiKey=5912444f7eba46f4af23efe4057e9838`);
         const json = await response.json();
         console.log(json);
         setNews(json);
@@ -35,7 +36,9 @@ export default function HomeScreen() {
     <ScrollView>
       <div>
         {news.articles.map((article, index) => (
-          <ArticleCard title={article.title} description={article.description} imageUrl={article.urlToImage} />
+          <a style={{ textDecoration: 'none' }} href={article.url} target="_blank" rel="noopener noreferrer" key={index}>
+            <ArticleCard title={article.title} description={article.description} imageUrl={article.urlToImage} />
+          </a>
         ))
         }
       </div>

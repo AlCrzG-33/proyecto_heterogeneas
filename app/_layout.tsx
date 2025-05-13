@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/hooks/useColorScheme"
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native"
 import { useFonts } from "expo-font"
 import { Stack } from "expo-router"
 import { StatusBar } from "expo-status-bar"
@@ -66,7 +65,7 @@ export default function RootLayout() {
   })
 
   return (
-    <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+    <>
       {/* NYT-style header */}
       <View style={[responsiveStyles.header, { backgroundColor: nytColors.headerBg }]}>
         <Text style={[responsiveStyles.date, { color: nytColors.text }]}>
@@ -101,6 +100,6 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </>
   )
 }
