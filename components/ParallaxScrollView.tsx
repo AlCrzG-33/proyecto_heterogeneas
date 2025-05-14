@@ -1,82 +1,75 @@
-import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from 'react-native-reanimated';
+import type { ReactNode } from "react"
+import { View, StyleSheet, Animated } from "react-native"
 
-import { ThemedView } from '@/components/ThemedView';
-import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-const HEADER_HEIGHT = 250;
-
-type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
-}>;
+interface ParallaxScrollViewProps {
+  children: ReactNode
+  headerImage: ReactNode
+  headerBackgroundColor?: {
+    light: string
+    dark: string
+  }
+  headerHeight?: number
+}
 
 export default function ParallaxScrollView({
   children,
   headerImage,
-  headerBackgroundColor,
-}: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
-  const bottom = useBottomTabOverflow();
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
-          ),
-        },
-        {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
-        },
-      ],
-    };
-  });
+  headerBackgroundColor = { light: "#D0D0D0", dark: "#353636" },
+  headerHeight = 200,
+}: ParallaxScrollViewProps) {
+  const scrollY = new Animated.Value(0)
+  const headerTranslate = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight / 2],
+    extrapolate: "clamp",
+  })
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.header,
+          {
+            height: headerHeight,
+            backgroundColor: headerBackgroundColor.light,
+            transform: [{ translateY: headerTranslate }],
+          },
+        ]}
+      >
+        {headerImage}
+      </Animated.View>
       <Animated.ScrollView
-        ref={scrollRef}
         scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+        contentContainerStyle={[styles.scrollViewContent, { paddingTop: headerHeight }]}
+      >
+        <View style={styles.content}>{children}</View>
       </Animated.ScrollView>
-    </ThemedView>
-  );
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f0f0f0",
   },
   header: {
-    height: HEADER_HEIGHT,
-    overflow: 'hidden',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    overflow: "hidden",
+    zIndex: 10,
+  },
+  scrollViewContent: {
+    paddingBottom: 20,
   },
   content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
+    backgroundColor: "#f0f0f0",
+    padding: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: -20,
   },
-});
+})
