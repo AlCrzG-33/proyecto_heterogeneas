@@ -54,23 +54,6 @@ export default function SettingsScreen() {
           ))}
         </View>
       </Collapsible>
-
-      <Collapsible title="Notifications">
-        <ThemedText>Configure how you want to receive news notifications.</ThemedText>
-        <View style={styles.notificationOption}>
-          <ThemedText>Breaking News</ThemedText>
-          <ThemeToggle value={true} onValueChange={() => {}} />
-        </View>
-        <View style={styles.notificationOption}>
-          <ThemedText>Daily Digest</ThemedText>
-          <ThemeToggle value={false} onValueChange={() => {}} />
-        </View>
-      </Collapsible>
-
-      <Collapsible title="About">
-        <ThemedText>News App v1.0.0</ThemedText>
-        <ThemedText>This app provides the latest news from various categories using the News API.</ThemedText>
-      </Collapsible>
     </ScrollView>
   )
 }
