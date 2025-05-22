@@ -34,9 +34,12 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.content}>
-        <Collapsible title="Theme" initiallyExpanded={true}>
+        <Collapsible title="Country news" initiallyExpanded={true}>
           <View style={styles.themeOption}>
-            <Text style={styles.optionText}>Dark Mode</Text>
+            <Text style={styles.optionText}>United States</Text>
+            <Text style={styles.optionText}>Mexico</Text>
+            <Text style={styles.optionText}>Germany</Text>
+            <Text style={styles.optionText}>Canada</Text>
             <ThemeToggle value={settings.darkMode} onValueChange={toggleDarkMode} />
           </View>
         </Collapsible>

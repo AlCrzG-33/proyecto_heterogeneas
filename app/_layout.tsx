@@ -20,13 +20,13 @@ export default function RootLayout() {
 
   if (!loaded) return null
 
-  const nytColors = {
-    background: colorScheme === "dark" ? "#121212" : "#FFFFFF",
-    text: colorScheme === "dark" ? "#F0F0F0" : "#121212",
-    accent: colorScheme === "dark" ? "#6B6B6B" : "#E2E2E2",
-    border: colorScheme === "dark" ? "#333333" : "#E0E0E0",
-    headerBg: colorScheme === "dark" ? "#1A1A1A" : "#FFFFFF",
-  }
+const nytColors = {
+  background: colorScheme === "dark" ? "#FFFFFF" : "#121212",
+  text: colorScheme === "dark" ? "#121212" : "#F0F0F0",
+  accent: colorScheme === "dark" ? "#E2E2E2" : "#6B6B6B",
+  border: colorScheme === "dark" ? "#E0E0E0" : "#333333",
+  headerBg: colorScheme === "dark" ? "#FFFFFF" : "#1A1A1A",
+}
 
   const responsiveStyles = StyleSheet.create({
     header: {
