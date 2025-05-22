@@ -3,12 +3,12 @@
 import CategoryChip from "@/components/CategoryChip"
 import { Collapsible } from "@/components/Collapsible"
 import { ThemedText } from "@/components/ThemedText"
-import ThemeToggle from "@/components/ThemeToggle"
 import { useSettings } from "@/context/SettingsContext"
-import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native"
 
 export default function SettingsScreen() {
   const { settings, setSettings } = useSettings()
+  const { height } = useWindowDimensions()
 
   const toggleCategory = (category: string) => {
     setSettings((prev) => ({
@@ -20,6 +20,15 @@ export default function SettingsScreen() {
     }))
   }
 
+  const availableCountries = [
+    { code: "us", name: "United States" },
+    { code: "mx", name: "Mexico" },
+    { code: "de", name: "Germany" },
+    { code: "ca", name: "Canada" },
+    { code: "fr", name: "France" },
+    { code: "jp", name: "Japan" },
+  ]
+
   const toggleDarkMode = (value: boolean) => {
     setSettings((prev) => ({
       ...prev,
@@ -28,24 +37,43 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { minHeight: height * 0.9 } // Asegura que haya suficiente espacio para desplazarse
+      ]}
+      showsVerticalScrollIndicator={true}
+      bounces={true}
+    >
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
 
       <View style={styles.content}>
         <Collapsible title="Country news" initiallyExpanded={true}>
-          <View style={styles.themeOption}>
-            <Text style={styles.optionText}>United States</Text>
-            <Text style={styles.optionText}>Mexico</Text>
-            <Text style={styles.optionText}>Germany</Text>
-            <Text style={styles.optionText}>Canada</Text>
-            <ThemeToggle value={settings.darkMode} onValueChange={toggleDarkMode} />
+          <ThemedText style={styles.sectionDescription}>Select the country for your news:</ThemedText>
+          <View style={styles.countryContainer}>
+            {availableCountries.map((country) => (
+              <CategoryChip
+                key={country.code}
+                label={country.name}
+                selected={settings.country === country.code}
+                onToggle={() =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    country: country.code,
+                  }))
+                }
+              />
+            ))}
           </View>
         </Collapsible>
 
+        <View style={styles.sectionSeparator} />
+
         <Collapsible title="Categories" initiallyExpanded={true}>
-          <ThemedText>Select your preferred news categories:</ThemedText>
+          <ThemedText style={styles.sectionDescription}>Select your preferred news categories:</ThemedText>
           <View style={styles.categoriesContainer}>
             {Object.entries(settings.categories).map(([category, selected]) => (
               <CategoryChip
@@ -57,6 +85,9 @@ export default function SettingsScreen() {
             ))}
           </View>
         </Collapsible>
+        
+        {/* Espacio adicional al final para asegurar que todo sea accesible */}
+        <View style={styles.bottomPadding} />
       </View>
     </ScrollView>
   )
@@ -66,6 +97,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f0f0f0",
+  },
+  contentContainer: {
+    flexGrow: 1,
+    paddingBottom: 40, // Padding adicional en la parte inferior
   },
   header: {
     padding: 16,
@@ -78,6 +113,10 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+  },
+  sectionDescription: {
+    marginBottom: 12,
+    fontSize: 16,
   },
   themeOption: {
     flexDirection: "row",
@@ -93,6 +132,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     marginTop: 8,
+    gap: 8, // Espacio entre chips
+  },
+  countryContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
+    gap: 8, // Espacio entre chips
   },
   notificationOption: {
     flexDirection: "row",
@@ -100,4 +146,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 8,
   },
+  sectionSeparator: {
+    height: 20, // Espacio entre secciones
+  },
+  bottomPadding: {
+    height: 60, // Espacio adicional al final
+  }
 })

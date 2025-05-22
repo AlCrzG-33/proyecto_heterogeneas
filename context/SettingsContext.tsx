@@ -12,6 +12,7 @@ const defaultSettings = {
     Technology: true,
   },
   language: "en",
+  country: "us",
 }
 
 const SettingsContext = createContext({

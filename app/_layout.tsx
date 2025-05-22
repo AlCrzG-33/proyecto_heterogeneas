@@ -20,17 +20,23 @@ export default function RootLayout() {
 
   if (!loaded) return null
 
-const nytColors = {
-  background: colorScheme === "dark" ? "#FFFFFF" : "#121212",
-  text: colorScheme === "dark" ? "#121212" : "#F0F0F0",
-  accent: colorScheme === "dark" ? "#E2E2E2" : "#6B6B6B",
-  border: colorScheme === "dark" ? "#E0E0E0" : "#333333",
-  headerBg: colorScheme === "dark" ? "#FFFFFF" : "#1A1A1A",
-}
+  // Modificar los colores para mejorar la visibilidad
+  const nytColors = {
+    background: colorScheme === "dark" ? "#FFFFFF" : "#121212",
+    text: colorScheme === "dark" ? "#121212" : "#F0F0F0",
+    accent: colorScheme === "dark" ? "#E2E2E2" : "#6B6B6B",
+    border: colorScheme === "dark" ? "#E0E0E0" : "#333333",
+    headerBg: colorScheme === "dark" ? "#FFFFFF" : "#1A1A1A",
+    statusBarBg: colorScheme === "dark" ? "#121212" : "#666666", // Color oscuro para la barra de estado
+  }
 
   const responsiveStyles = StyleSheet.create({
+    statusBarBackground: {
+      height: Platform.OS === 'ios' ? insets.top : 0,
+      backgroundColor: nytColors.statusBarBg, // Fondo oscuro para la barra de estado
+    },
     header: {
-      paddingTop: Platform.OS === "ios" ? insets.top : 20,
+      paddingTop: Platform.OS === "ios" ? 10 : 20, // Reducir el paddingTop ya que tenemos un View separado para la barra de estado
       paddingBottom: isSmallDevice ? 5 : 10,
       paddingHorizontal: isSmallDevice ? 10 : isLargeDevice ? 24 : 16,
       borderBottomWidth: 1,
@@ -40,9 +46,11 @@ const nytColors = {
       fontSize: isSmallDevice ? 10 : isLargeDevice ? 14 : 12,
       textAlign: "center",
       marginBottom: isSmallDevice ? 4 : 8,
+      fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
+      // Se ha quitado fontWeight: 'bold' de aquí
     },
     title: {
-      fontFamily: "TimesNewRoman",
+      fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
       fontSize: isSmallDevice ? 24 : isLargeDevice ? 42 : 32,
       textAlign: "center",
       marginBottom: isSmallDevice ? 8 : 12,
@@ -56,6 +64,12 @@ const nytColors = {
 
   return (
     <SettingsProvider>
+      {/* Fondo oscuro para la barra de estado */}
+      <View style={responsiveStyles.statusBarBackground} />
+      
+      {/* Configurar la barra de estado para que sea visible */}
+      <StatusBar style={colorScheme === "dark" ? "light" : "light"} />
+      
       {/* NYT-style header */}
       <View style={[responsiveStyles.header, { backgroundColor: nytColors.headerBg }]}>
         <Text style={[responsiveStyles.date, { color: nytColors.text }]}>
@@ -78,7 +92,7 @@ const nytColors = {
           },
           headerTintColor: nytColors.text,
           headerTitleStyle: {
-            fontFamily: "TimesNewRoman",
+            fontFamily: Platform.OS === 'ios' ? 'Times New Roman' : 'serif',
             fontSize: isSmallDevice ? 18 : isLargeDevice ? 24 : 20,
           },
           contentStyle: {
@@ -89,7 +103,6 @@ const nytColors = {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
     </SettingsProvider>
   )
 }
