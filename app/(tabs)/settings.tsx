@@ -1,28 +1,29 @@
 "use client"
 
-import { useState } from "react"
-import { StyleSheet, View, ScrollView, Text } from "react-native"
+import CategoryChip from "@/components/CategoryChip"
 import { Collapsible } from "@/components/Collapsible"
 import { ThemedText } from "@/components/ThemedText"
 import ThemeToggle from "@/components/ThemeToggle"
-import CategoryChip from "@/components/CategoryChip"
+import { useSettings } from "@/context/SettingsContext"
+import { ScrollView, StyleSheet, Text, View } from "react-native"
 
 export default function SettingsScreen() {
-  const [darkMode, setDarkMode] = useState(false)
-  const [categories, setCategories] = useState({
-    Business: true,
-    Entertainment: true,
-    General: true,
-    Sports: true,
-    Health: true,
-    Science: true,
-    Technology: true,
-  })
+  const { settings, setSettings } = useSettings()
 
   const toggleCategory = (category: string) => {
-    setCategories((prev) => ({
+    setSettings((prev) => ({
       ...prev,
-      [category]: !prev[category],
+      categories: {
+        ...prev.categories,
+        [category]: !prev.categories[category],
+      },
+    }))
+  }
+
+  const toggleDarkMode = (value: boolean) => {
+    setSettings((prev) => ({
+      ...prev,
+      darkMode: value,
     }))
   }
 
@@ -36,14 +37,14 @@ export default function SettingsScreen() {
         <Collapsible title="Theme" initiallyExpanded={true}>
           <View style={styles.themeOption}>
             <Text style={styles.optionText}>Dark Mode</Text>
-            <ThemeToggle value={darkMode} onValueChange={setDarkMode} />
+            <ThemeToggle value={settings.darkMode} onValueChange={toggleDarkMode} />
           </View>
         </Collapsible>
 
         <Collapsible title="Categories" initiallyExpanded={true}>
           <ThemedText>Select your preferred news categories:</ThemedText>
           <View style={styles.categoriesContainer}>
-            {Object.entries(categories).map(([category, selected]) => (
+            {Object.entries(settings.categories).map(([category, selected]) => (
               <CategoryChip
                 key={category}
                 label={category}

@@ -1,3 +1,4 @@
+import { SettingsProvider } from "@/context/SettingsContext"
 import { useColorScheme } from "@/hooks/useColorScheme"
 import { useFonts } from "expo-font"
 import { Stack } from "expo-router"
@@ -8,22 +9,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
-  const { width, height } = useWindowDimensions()
+  const { width } = useWindowDimensions()
   const insets = useSafeAreaInsets()
   const isSmallDevice = width < 380
-  const isMediumDevice = width >= 380 && width < 768
   const isLargeDevice = width >= 768
 
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   })
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null
-  }
+  if (!loaded) return null
 
-  // NYT style theme colors
   const nytColors = {
     background: colorScheme === "dark" ? "#121212" : "#FFFFFF",
     text: colorScheme === "dark" ? "#F0F0F0" : "#121212",
@@ -32,7 +28,6 @@ export default function RootLayout() {
     headerBg: colorScheme === "dark" ? "#1A1A1A" : "#FFFFFF",
   }
 
-  // Responsive styles based on device size
   const responsiveStyles = StyleSheet.create({
     header: {
       paddingTop: Platform.OS === "ios" ? insets.top : 20,
@@ -57,15 +52,10 @@ export default function RootLayout() {
       justifyContent: "space-between",
       paddingHorizontal: isSmallDevice ? 10 : isLargeDevice ? 30 : 20,
     },
-    navItem: {
-      fontSize: isSmallDevice ? 12 : isLargeDevice ? 16 : 14,
-      fontFamily: "TimesNewRoman",
-      fontWeight: "bold",
-    },
   })
 
   return (
-    <>
+    <SettingsProvider>
       {/* NYT-style header */}
       <View style={[responsiveStyles.header, { backgroundColor: nytColors.headerBg }]}>
         <Text style={[responsiveStyles.date, { color: nytColors.text }]}>
@@ -80,7 +70,7 @@ export default function RootLayout() {
         <View style={responsiveStyles.headerNav}></View>
       </View>
 
-      {/* Main content area with Stack Navigator */}
+      {/* Navegación principal */}
       <Stack
         screenOptions={{
           headerStyle: {
@@ -100,6 +90,6 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </>
+    </SettingsProvider>
   )
 }
