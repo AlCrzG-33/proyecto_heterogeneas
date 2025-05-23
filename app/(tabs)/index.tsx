@@ -3,11 +3,21 @@
 import ArticleCard from "@/components/ArticleCard"
 import { useSettings } from "@/context/SettingsContext"
 import { useEffect, useState } from "react"
-import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native"
+import {
+  ActivityIndicator,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native"
 
 export default function HomeScreen() {
   const [news, setNews] = useState({ articles: [] })
   const [loading, setLoading] = useState(true)
+  const [apiWarning, setApiWarning] = useState("")
   const { width, height } = useWindowDimensions()
   const { settings } = useSettings()
 
@@ -23,27 +33,37 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchNews = async () => {
       setLoading(true)
+      setApiWarning("")
 
       try {
         const selectedCategories = Object.entries(settings.categories)
           .filter(([_, isSelected]) => isSelected)
           .map(([category]) => category.toLowerCase())
 
-        // Si no hay categorías seleccionadas, usar 'general'
         const categoriesToFetch = selectedCategories.length > 0 ? selectedCategories : ['general']
         const allArticles = []
 
         for (const category of categoriesToFetch) {
-          const response = await fetch(
-            `https://newsapi.org/v2/top-headlines?country=${settings.country || 'us'}&category=${category}&apiKey=5912444f7eba46f4af23efe4057e9838`
-          )
+          await new Promise(res => setTimeout(res, 1500))
+          const url = `https://gnews.io/api/v4/top-headlines?category=${category}&country=${settings.country}&apikey=637c2ffe01ed65727d3e6170cf40a75f`
+          console.log("Request URL:", url)
+
+          const response = await fetch(url)
+
+          if (response.status === 429) {
+            console.warn("Error 429: Too Many Requests")
+            setApiWarning("Has hecho demasiadas solicitudes. Espera un momento.")
+            continue
+          }
+
           const json = await response.json()
-          if (json.articles) {
+          console.log(`Fetched ${json.articles?.length || 0} articles from ${category}`)
+
+          if (Array.isArray(json.articles)) {
             allArticles.push(...json.articles)
           }
         }
 
-        // Eliminar duplicados basados en el título
         const uniqueArticles = Array.from(
           new Map(allArticles.map(article => [article.title, article])).values()
         )
@@ -51,6 +71,7 @@ export default function HomeScreen() {
         setNews({ articles: uniqueArticles })
       } catch (error) {
         console.error("Error fetching news:", error)
+        setApiWarning("Ocurrió un error al cargar las noticias.")
       } finally {
         setLoading(false)
       }
@@ -68,7 +89,7 @@ export default function HomeScreen() {
   }
 
   const renderArticlesGrid = () => {
-    if (!news.articles || news.articles.length === 0) {
+    if (!Array.isArray(news.articles) || news.articles.length === 0) {
       return (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No hay noticias disponibles. Intenta seleccionar otras categorías.</Text>
@@ -85,18 +106,18 @@ export default function HomeScreen() {
       articleRows.push(
         <View key={`row-${i}`} style={styles.row}>
           {rowArticles.map((article, index) => (
-            <View key={`article-${i + index}`} style={[styles.articleWrapper, { width: `${100 / numColumns}%` }]}>
-              <TouchableOpacity 
-                onPress={() => Linking.openURL(article.url)}
-                style={styles.touchable}
-              >
+            <View
+              key={`article-${i + index}`}
+              style={[styles.articleWrapper, { width: `${100 / numColumns}%` }]}
+            >
+              <TouchableOpacity onPress={() => Linking.openURL(article.url)} style={styles.touchable}>
                 <ArticleCard
                   title={article.title || "Title"}
                   description={
                     article.description ||
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"
                   }
-                  imageUrl={article.urlToImage}
+                  imageUrl={article.image || "https://via.placeholder.com/400x200?text=No+Image"}
                 />
               </TouchableOpacity>
             </View>
@@ -106,7 +127,10 @@ export default function HomeScreen() {
           {Array(numColumns - rowArticles.length)
             .fill()
             .map((_, index) => (
-              <View key={`empty-${i + index}`} style={[styles.articleWrapper, { width: `${100 / numColumns}%` }]} />
+              <View
+                key={`empty-${i + index}`}
+                style={[styles.articleWrapper, { width: `${100 / numColumns}%` }]}
+              />
             ))}
         </View>
       )
@@ -116,20 +140,16 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
-      contentContainerStyle={[
-        styles.articlesContainer,
-        { minHeight: height * 1.2 } // Aumentar el espacio de scroll
-      ]}
+      contentContainerStyle={[styles.articlesContainer, { minHeight: height * 1.2 }]}
       showsVerticalScrollIndicator={true}
       bounces={true}
     >
-      <View style={styles.content}>
-        {renderArticlesGrid()}
-      </View>
-      
-      {/* Espacio adicional al final para asegurar que todo sea accesible */}
+      {apiWarning !== "" && (
+        <Text style={{ color: "red", textAlign: "center", marginVertical: 10 }}>{apiWarning}</Text>
+      )}
+      <View style={styles.content}>{renderArticlesGrid()}</View>
       <View style={styles.bottomPadding} />
     </ScrollView>
   )
@@ -142,15 +162,15 @@ const styles = StyleSheet.create({
   },
   articlesContainer: {
     padding: 8,
-    paddingBottom: 100, // Padding adicional en la parte inferior
+    paddingBottom: 100,
   },
   content: {
     flex: 1,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#f0f0f0",
     padding: 20,
   },
@@ -161,22 +181,22 @@ const styles = StyleSheet.create({
   articleWrapper: {
     paddingHorizontal: 8,
     marginBottom: 16,
-    height: 350, // Altura fija para cada tarjeta
+    height: 350,
   },
   touchable: {
     flex: 1,
   },
   emptyContainer: {
     padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   bottomPadding: {
-    height: 80, // Espacio adicional al final
-  }
+    height: 80,
+  },
 })

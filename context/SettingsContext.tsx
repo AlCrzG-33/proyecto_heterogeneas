@@ -3,15 +3,16 @@ import React, { createContext, useContext, useState } from "react"
 
 const defaultSettings = {
   categories: {
-    Business: true,
-    Entertainment: true,
     General: true,
-    Sports: true,
-    Health: true,
-    Science: true,
-    Technology: true,
+    World: false,
+    Nation: false,
+    Business: false,
+    Technology: false,
+    Entertainment: false,
+    Sports: false,
+    Science: false,
+    Health: false,
   },
-  language: "en",
   country: "us",
 }
 

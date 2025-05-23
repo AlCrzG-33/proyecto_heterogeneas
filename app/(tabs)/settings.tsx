@@ -20,14 +20,38 @@ export default function SettingsScreen() {
     }))
   }
 
-  const availableCountries = [
-    { code: "us", name: "United States" },
-    { code: "mx", name: "Mexico" },
-    { code: "de", name: "Germany" },
-    { code: "ca", name: "Canada" },
-    { code: "fr", name: "France" },
-    { code: "jp", name: "Japan" },
-  ]
+const availableCountries = [
+  { code: "au", name: "Australia" },
+  { code: "br", name: "Brazil" },
+  { code: "ca", name: "Canada" },
+  { code: "cn", name: "China" },
+  { code: "eg", name: "Egypt" },
+  { code: "fr", name: "France" },
+  { code: "de", name: "Germany" },
+  { code: "gr", name: "Greece" },
+  { code: "hk", name: "Hong Kong" },
+  { code: "in", name: "India" },
+  { code: "ie", name: "Ireland" },
+  { code: "il", name: "Israel" },
+  { code: "it", name: "Italy" },
+  { code: "jp", name: "Japan" },
+  { code: "nl", name: "Netherlands" },
+  { code: "no", name: "Norway" },
+  { code: "pk", name: "Pakistan" },
+  { code: "pe", name: "Peru" },
+  { code: "ph", name: "Philippines" },
+  { code: "pt", name: "Portugal" },
+  { code: "ro", name: "Romania" },
+  { code: "ru", name: "Russian Federation" },
+  { code: "sg", name: "Singapore" },
+  { code: "es", name: "Spain" },
+  { code: "se", name: "Sweden" },
+  { code: "ch", name: "Switzerland" },
+  { code: "tw", name: "Taiwan" },
+  { code: "ua", name: "Ukraine" },
+  { code: "gb", name: "United Kingdom" },
+  { code: "us", name: "United States" },
+]
 
   const toggleDarkMode = (value: boolean) => {
     setSettings((prev) => ({
