@@ -10,48 +10,76 @@ export default function SettingsScreen() {
   const { settings, setSettings } = useSettings()
   const { height } = useWindowDimensions()
 
-  const toggleCategory = (category: string) => {
-    setSettings((prev) => ({
-      ...prev,
-      categories: {
-        ...prev.categories,
-        [category]: !prev.categories[category],
-      },
-    }))
+  const enforceCategoryLimit = (category) => {
+    const currentSelected = Object.entries(settings.categories)
+      .filter(([_, selected]) => selected)
+      .map(([cat]) => cat)
+
+    const isSelected = settings.categories[category]
+
+    if (isSelected) {
+      setSettings((prev) => ({
+        ...prev,
+        categories: {
+          ...prev.categories,
+          [category]: false,
+        },
+      }))
+    } else {
+      if (currentSelected.length < 2) {
+        setSettings((prev) => ({
+          ...prev,
+          categories: {
+            ...prev.categories,
+            [category]: true,
+          },
+        }))
+      } else {
+        const [first] = currentSelected
+        const updatedCategories = { ...settings.categories }
+        updatedCategories[first] = false
+        updatedCategories[category] = true
+
+        setSettings((prev) => ({
+          ...prev,
+          categories: updatedCategories,
+        }))
+      }
+    }
   }
 
-const availableCountries = [
-  { code: "au", name: "Australia" },
-  { code: "br", name: "Brazil" },
-  { code: "ca", name: "Canada" },
-  { code: "cn", name: "China" },
-  { code: "eg", name: "Egypt" },
-  { code: "fr", name: "France" },
-  { code: "de", name: "Germany" },
-  { code: "gr", name: "Greece" },
-  { code: "hk", name: "Hong Kong" },
-  { code: "in", name: "India" },
-  { code: "ie", name: "Ireland" },
-  { code: "il", name: "Israel" },
-  { code: "it", name: "Italy" },
-  { code: "jp", name: "Japan" },
-  { code: "nl", name: "Netherlands" },
-  { code: "no", name: "Norway" },
-  { code: "pk", name: "Pakistan" },
-  { code: "pe", name: "Peru" },
-  { code: "ph", name: "Philippines" },
-  { code: "pt", name: "Portugal" },
-  { code: "ro", name: "Romania" },
-  { code: "ru", name: "Russian Federation" },
-  { code: "sg", name: "Singapore" },
-  { code: "es", name: "Spain" },
-  { code: "se", name: "Sweden" },
-  { code: "ch", name: "Switzerland" },
-  { code: "tw", name: "Taiwan" },
-  { code: "ua", name: "Ukraine" },
-  { code: "gb", name: "United Kingdom" },
-  { code: "us", name: "United States" },
-]
+  const availableCountries = [
+    { code: "au", name: "Australia" },
+    { code: "br", name: "Brazil" },
+    { code: "ca", name: "Canada" },
+    { code: "cn", name: "China" },
+    { code: "eg", name: "Egypt" },
+    { code: "fr", name: "France" },
+    { code: "de", name: "Germany" },
+    { code: "gr", name: "Greece" },
+    { code: "hk", name: "Hong Kong" },
+    { code: "in", name: "India" },
+    { code: "ie", name: "Ireland" },
+    { code: "il", name: "Israel" },
+    { code: "it", name: "Italy" },
+    { code: "jp", name: "Japan" },
+    { code: "nl", name: "Netherlands" },
+    { code: "no", name: "Norway" },
+    { code: "pk", name: "Pakistan" },
+    { code: "pe", name: "Peru" },
+    { code: "ph", name: "Philippines" },
+    { code: "pt", name: "Portugal" },
+    { code: "ro", name: "Romania" },
+    { code: "ru", name: "Russian Federation" },
+    { code: "sg", name: "Singapore" },
+    { code: "es", name: "Spain" },
+    { code: "se", name: "Sweden" },
+    { code: "ch", name: "Switzerland" },
+    { code: "tw", name: "Taiwan" },
+    { code: "ua", name: "Ukraine" },
+    { code: "gb", name: "United Kingdom" },
+    { code: "us", name: "United States" },
+  ]
 
   const toggleDarkMode = (value: boolean) => {
     setSettings((prev) => ({
@@ -61,11 +89,11 @@ const availableCountries = [
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
       contentContainerStyle={[
         styles.contentContainer,
-        { minHeight: height * 0.9 } // Asegura que haya suficiente espacio para desplazarse
+        { minHeight: height * 0.9 },
       ]}
       showsVerticalScrollIndicator={true}
       bounces={true}
@@ -104,13 +132,12 @@ const availableCountries = [
                 key={category}
                 label={category}
                 selected={selected}
-                onToggle={() => toggleCategory(category)}
+                onToggle={() => enforceCategoryLimit(category)}
               />
             ))}
           </View>
         </Collapsible>
-        
-        {/* Espacio adicional al final para asegurar que todo sea accesible */}
+
         <View style={styles.bottomPadding} />
       </View>
     </ScrollView>
@@ -124,7 +151,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    paddingBottom: 40, // Padding adicional en la parte inferior
+    paddingBottom: 40,
   },
   header: {
     padding: 16,
@@ -156,13 +183,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     marginTop: 8,
-    gap: 8, // Espacio entre chips
+    gap: 8,
   },
   countryContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     marginTop: 8,
-    gap: 8, // Espacio entre chips
+    gap: 8,
   },
   notificationOption: {
     flexDirection: "row",
@@ -171,9 +198,9 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   sectionSeparator: {
-    height: 20, // Espacio entre secciones
+    height: 20,
   },
   bottomPadding: {
-    height: 60, // Espacio adicional al final
-  }
+    height: 60,
+  },
 })
