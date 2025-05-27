@@ -80,7 +80,7 @@ export default function RootLayout() {
             year: "numeric",
           })}
         </Text>
-        <Text style={[responsiveStyles.title, { color: nytColors.text }]}>El Sentinela</Text>
+        <Text style={[responsiveStyles.title, { color: nytColors.text }]}>El Centinela</Text>
         <View style={responsiveStyles.headerNav}></View>
       </View>
 
